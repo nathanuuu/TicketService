@@ -7,12 +7,17 @@ public class TicketServiceImpl implements TicketService {
     static String RESERVE_COMMAND = "reserve";
     static String EXIT_COMMAND = "exit";
 
+    private Theater theater;
+
+    public TicketServiceImpl(int rows, int cols) {
+        this.theater = new Theater(rows, cols);
+    }
+
     public int numSeatsAvailable() {
-        return 0;
+        return this.theater.getAvailableSeats();
     }
 
     public SeatHold findAndHoldSeats(int numSeats, String customerEmail) {
-
         return null;
     }
 
@@ -21,7 +26,7 @@ public class TicketServiceImpl implements TicketService {
     }
 
     public static void main(String[] args) {
-        TicketService ts = new TicketServiceImpl();
+        TicketService ts = new TicketServiceImpl(33, 9);
         Scanner scanner = new Scanner(System.in);
 
         while (true) {

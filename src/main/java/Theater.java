@@ -7,13 +7,16 @@ public class Theater {
     String[][] seatMap;
     int rows;
     int cols;
+    int availableSeats;
     static String AVALIABLE = "s";
     static String ONHOLD = "h";
     static String RESERVED = "r";
 
+
     public Theater (int rows, int cols) {
         this.rows = rows;
         this.cols = cols;
+        this.availableSeats = this.rows * this.cols;
         this.seatMap = new String[rows][cols];
         try {
             for (int i = 0; i < rows; i++) {
@@ -24,6 +27,10 @@ public class Theater {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public int getAvailableSeats() {
+        return availableSeats;
     }
 
     public void setAvailable(int row, int col) throws Exception {
