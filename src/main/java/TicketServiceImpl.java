@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Scanner;
 
 public class TicketServiceImpl implements TicketService {
@@ -7,10 +9,29 @@ public class TicketServiceImpl implements TicketService {
     static String RESERVE_COMMAND = "reserve";
     static String EXIT_COMMAND = "exit";
 
+    ArrayList<SeatHold> seatHoldList;
+    HashMap<String, SeatHold[]> emailTable;
+    HashMap<String, SeatHold> idTable;
+
     private Theater theater;
 
     public TicketServiceImpl(int rows, int cols) {
         this.theater = new Theater(rows, cols);
+        this.seatHoldList = new ArrayList<SeatHold>();
+        this.emailTable = new HashMap<String, SeatHold[]>();
+        this.idTable = new HashMap<String, SeatHold>();
+    }
+
+    private void addSeatHold(SeatHold seatHold) {
+
+    }
+
+    private void deleteSeatHold(SeatHold seatHold) {
+
+    }
+
+    private void removeExpiredSeatHold() {
+
     }
 
     public int numSeatsAvailable() {
@@ -18,7 +39,12 @@ public class TicketServiceImpl implements TicketService {
     }
 
     public SeatHold findAndHoldSeats(int numSeats, String customerEmail) {
-        return null;
+        try {
+            return new SeatHold(false, "Default message.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public String reserveSeats(int seatHoldId, String customerEmail) {
