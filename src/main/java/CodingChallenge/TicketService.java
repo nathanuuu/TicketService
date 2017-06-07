@@ -1,3 +1,5 @@
+package CodingChallenge;
+
 public interface TicketService {
     /**
      * The number of seats in the venue that are neither held nor reserved
@@ -10,7 +12,7 @@ public interface TicketService {
      *
      * @param numSeats the number of seats to find and hold
      * @param customerEmail unique identifier for the customer
-     * @return a SeatHold object identifying the specific seats and related
+     * @return a CodingChallenge.SeatHold object identifying the specific seats and related
     information
      */
     SeatHold findAndHoldSeats(int numSeats, String customerEmail);

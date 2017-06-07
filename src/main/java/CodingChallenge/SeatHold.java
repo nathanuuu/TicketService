@@ -1,3 +1,5 @@
+package CodingChallenge;
+
 public class SeatHold {
 
     boolean success;

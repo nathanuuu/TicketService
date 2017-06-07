@@ -33,12 +33,13 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>TicketServiceImpl</mainClass>
+                            <mainClass>CodingChallenge.TicketServiceImpl</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
             </plugin>
         </plugins>
     </build>
+
 
 </project>
