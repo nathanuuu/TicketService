@@ -23,4 +23,9 @@ public interface TicketService {
      * @return a reservation confirmation code
      */
     String reserveSeats(int seatHoldId, String customerEmail);
+
+    /**
+     * Display map of available seats in console
+     */
+    void printSeatMap();
 }

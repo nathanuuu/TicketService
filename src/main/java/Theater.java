@@ -16,16 +16,11 @@ public class Theater {
     public Theater (int rows, int cols) {
         this.rows = rows;
         this.cols = cols;
-        this.availableSeats = this.rows * this.cols;
         this.seatMap = new String[rows][cols];
-        try {
-            for (int i = 0; i < rows; i++) {
-                for (int j = 0; j < cols; j++) {
-                    setAvailable(i, j);
-                }
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                setAvailable(i, j);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
@@ -33,31 +28,69 @@ public class Theater {
         return availableSeats;
     }
 
-    public void setAvailable(int row, int col) throws Exception {
-        if (!(0 <= row && row < this.rows && 0 <= col && col < this.cols)) {
-            throw new Exception("Input row and column out of bounds, input row: " + row + " input column: "
-                    + col + " actual number of rows: " + this.rows + " actual number of columns: " + cols);
+    public synchronized int[][] holdSeatsByCount(int numSeats) {
+        if (!(this.getAvailableSeats() >= numSeats)) {
+            return null;
         }
+        // logic to get best seats in the theater
+        int[][] bestSeats = new int[numSeats][2];
+        int seat = 0;
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                if (seatMap[i][j].equals(this.AVALIABLE)) {
+                    this.setOnHold(i, j);
+                    bestSeats[seat][0] = i;
+                    bestSeats[seat][1] = j;
+                    seat++;
+                    if (seat == bestSeats.length) {
+                        return bestSeats;
+                    }
+                }
+            }
+        }
+        return bestSeats;
+    }
+
+    public boolean reserveSeats(int[][] seats) {
+        for (int i = 0; i < seats.length; i++) {
+            this.setReserved(seats[i][0], seats[i][1]);
+        }
+        return true;
+    }
+
+    public boolean releaseSeats(int[][] seats) {
+        for (int i = 0; i < seats.length; i++) {
+            this.setAvailable(seats[i][0], seats[i][1]);
+        }
+        return true;
+    }
+
+    public void printSeatMap() {
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                System.out.print(seatMap[i][j] + " ");
+            }
+            System.out.println();
+        }
+    }
+
+    private void setAvailable(int row, int col) {
         this.seatMap[row][col] = this.AVALIABLE;
+        this.availableSeats += 1;
     }
 
-    public void setOnHold(int row, int col) throws Exception {
-        if (!(0 <= row && row < this.rows && 0 <= col && col < this.cols)) {
-            throw new Exception("Input row and column out of bounds, input row: " + row + " input column: "
-            + col + " actual number of rows: " + this.rows + " actual number of columns: " + cols);
-        }
+    private void setOnHold(int row, int col) {
+        assert(this.seatMap[row][col].equals(this.AVALIABLE));
         this.seatMap[row][col] = this.ONHOLD;
+        this.availableSeats -= 1;
     }
 
-    public void setReserved(int row, int col) throws Exception {
-        if (!(0 <= row && row < this.rows && 0 <= col && col < this.cols)) {
-            throw new Exception("Input row and column out of bounds, input row: " + row + " input column: "
-                    + col + " actual number of rows: " + this.rows + " actual number of columns: " + cols);
-        }
+    private void setReserved(int row, int col) {
+        assert(this.seatMap[row][col].equals(this.ONHOLD));
         this.seatMap[row][col] = this.RESERVED;
     }
 
-    public void fileImport(String fileName) {
+    private void fileImport(String fileName) {
         InputStream is = getClass().getClassLoader().getResourceAsStream(fileName);
         BufferedReader r = new BufferedReader(new InputStreamReader(is));
         String line;

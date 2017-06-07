@@ -14,25 +14,32 @@ public class TicketServiceImpl implements TicketService {
     static String EXIT_COMMAND = "exit";
 
     ArrayList<SeatHold> seatHoldList;
-    HashMap<String, SeatHold[]> emailTable;
-    HashMap<String, SeatHold> idTable;
+    HashMap<String, ArrayList<SeatHold>> emailTable;
+    HashMap<Integer, SeatHold> idTable;
 
     private Theater theater;
 
     public TicketServiceImpl(int rows, int cols) {
         this.theater = new Theater(rows, cols);
         this.seatHoldList = new ArrayList<SeatHold>();
-        this.emailTable = new HashMap<String, SeatHold[]>();
-        this.idTable = new HashMap<String, SeatHold>();
+        this.emailTable = new HashMap<String, ArrayList<SeatHold>>();
+        this.idTable = new HashMap<Integer, SeatHold>();
     }
 
     private void addSeatHold(SeatHold seatHold) {
         // add to seat hold list
-
+        this.seatHoldList.add(seatHold);
         // add to email table
-
+        ArrayList<SeatHold> seatHoldList = emailTable.get(seatHold.getCustomerEmail());
+        if (seatHoldList == null) {
+            seatHoldList = new ArrayList<SeatHold>();
+            seatHoldList.add(seatHold);
+            emailTable.put(seatHold.getCustomerEmail(), seatHoldList);
+        } else {
+            seatHoldList.add(seatHold);
+        }
         // add to id table
-
+        idTable.put(seatHold.getId(), seatHold);
     }
 
     private void deleteSeatHold(SeatHold seatHold) {
@@ -57,7 +64,15 @@ public class TicketServiceImpl implements TicketService {
 
     public SeatHold findAndHoldSeats(int numSeats, String customerEmail) {
         try {
-            return new SeatHold(false, "Not enough seats.");
+            if (numSeats <= 0) {
+                return new SeatHold(false, "Invalid quantity of seats to hold.");
+            }
+            int[][] heldSeats = theater.holdSeatsByCount(numSeats);
+            if (heldSeats == null) {
+                return new SeatHold(false, "Not enough seats available. Try again later.");
+            } else {
+                return new SeatHold(true, 12345, numSeats, customerEmail, heldSeats);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -66,16 +81,21 @@ public class TicketServiceImpl implements TicketService {
 
     public String reserveSeats(int seatHoldId, String customerEmail) {
         // need to check time stamp for expiration in case it is not reaped
-
+        // TODO: 6/6/17  
 
         return "ok";
     }
 
+    public void printSeatMap() {
+        this.theater.printSeatMap();
+    }
+
     public static void main(String[] args) {
-        TicketService ts = new TicketServiceImpl(33, 9);
+        TicketService ts = new TicketServiceImpl(9, 33);
         Scanner scanner = new Scanner(System.in);
 
         while (true) {
+            ts.printSeatMap();
             System.out.print("Enter your option: ");
             String[] arguments = scanner.nextLine().split(" ");
 

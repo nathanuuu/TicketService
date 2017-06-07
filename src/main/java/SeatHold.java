@@ -2,9 +2,10 @@ public class SeatHold {
 
     boolean success;
     String message = "Seat hold succeeded!";
-    String id;
+    int id;
     int numSeats;
     String customerEmail;
+    int[][] seats;
     long time;
 
     public SeatHold(boolean success, String message) throws Exception {
@@ -15,8 +16,9 @@ public class SeatHold {
         this.message = message;
     }
 
-    public SeatHold(boolean success, String id, int numSeats, String customerEmail) throws Exception {
-        if (success != false) {
+    public SeatHold(boolean success, int id, int numSeats,
+                    String customerEmail, int[][] seats) throws Exception {
+        if (success != true) {
             throw new Exception("Method can only be called with true value.");
         }
         this.success = success;
@@ -26,7 +28,7 @@ public class SeatHold {
         this.time = System.currentTimeMillis();
     }
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
@@ -49,4 +51,10 @@ public class SeatHold {
     public long getTime() {
         return time;
     }
+
+    public int[][] getSeats() {
+        return seats;
+    }
+
+
 }
