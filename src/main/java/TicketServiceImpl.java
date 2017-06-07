@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 import java.util.Scanner;
 
 public class TicketServiceImpl implements TicketService {
@@ -12,6 +13,8 @@ public class TicketServiceImpl implements TicketService {
     static String FIND_AND_HOLD_COMMAND = "hold";
     static String RESERVE_COMMAND = "reserve";
     static String EXIT_COMMAND = "exit";
+
+    Random rand = new Random();
 
     ArrayList<SeatHold> seatHoldList;
     HashMap<String, ArrayList<SeatHold>> emailTable;
@@ -62,6 +65,14 @@ public class TicketServiceImpl implements TicketService {
         return this.theater.getAvailableSeats();
     }
 
+    private int idGenerator() {
+        int id = rand.nextInt(1000000000);
+        while (idTable.containsKey(id) == true) {
+            id = rand.nextInt();
+        }
+        return id;
+    }
+
     public SeatHold findAndHoldSeats(int numSeats, String customerEmail) {
         try {
             if (numSeats <= 0) {
@@ -71,7 +82,9 @@ public class TicketServiceImpl implements TicketService {
             if (heldSeats == null) {
                 return new SeatHold(false, "Not enough seats available. Try again later.");
             } else {
-                return new SeatHold(true, 12345, numSeats, customerEmail, heldSeats);
+                SeatHold seatHold = new SeatHold(true, idGenerator(), numSeats, customerEmail, heldSeats);
+                addSeatHold(seatHold);
+                return seatHold;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -117,7 +130,8 @@ public class TicketServiceImpl implements TicketService {
                     System.out.println("System error!");
                 }
                 if (seatHold.isSuccess() == true) {
-                    System.out.println(seatHold.getMessage() + "Confirmation ID: " + seatHold.getId());
+                    String idString = String.format("%09d", seatHold.getId());
+                    System.out.println(seatHold.getMessage() + "Confirmation ID: " + idString);
                 } else {
                     System.out.println("Seat hold failed. " + seatHold.getMessage());
                 }
