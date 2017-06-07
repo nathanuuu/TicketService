@@ -33,6 +33,7 @@ public class Theater {
             return null;
         }
         // logic to get best seats in the theater
+        // TODO: 6/7/17 Update logic here for best seats 
         int[][] bestSeats = new int[numSeats][2];
         int seat = 0;
         for (int i = 0; i < rows; i++) {
