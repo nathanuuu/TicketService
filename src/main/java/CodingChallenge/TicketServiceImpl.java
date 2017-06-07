@@ -13,9 +13,10 @@ public class TicketServiceImpl implements TicketService {
     static String GET_NUMBER_COMMAND = "number";
     static String FIND_AND_HOLD_COMMAND = "hold";
     static String RESERVE_COMMAND = "reserve";
+    static String MAP_COMMAND = "map";
     static String EXIT_COMMAND = "exit";
 
-    int EXPIRATION = 600000;
+    int EXPIRATION;
 
     Random rand = new Random();
 
@@ -139,7 +140,6 @@ public class TicketServiceImpl implements TicketService {
     private void commandLineHandler() {
         Scanner scanner = new Scanner(System.in);
         while (true) {
-            printSeatMap();
             System.out.print("Enter your option: ");
             String[] arguments = scanner.nextLine().split(" ");
 
@@ -180,6 +180,8 @@ public class TicketServiceImpl implements TicketService {
                 }
                 String reserveMessage = reserveSeats(seatHoldID, customerEmail);
                 System.out.println("Seat reservation " + reserveMessage);
+            } else if (command.equals(MAP_COMMAND)) {
+                printSeatMap();
             } else if (command.equals(EXIT_COMMAND)) {
                 System.exit(0);
             } else {

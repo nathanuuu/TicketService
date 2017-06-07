@@ -5,7 +5,6 @@ public class SeatHold {
     boolean success;
     String message = "Seat hold succeeded!";
     int id;
-    int numSeats;
     String customerEmail;
     int[][] seats;
     long time;
@@ -24,7 +23,6 @@ public class SeatHold {
         }
         this.success = success;
         this.id = id;
-        this.numSeats = numSeats;
         this.customerEmail = customerEmail;
         this.time = System.currentTimeMillis();
         this.seats = seats;
@@ -34,9 +32,6 @@ public class SeatHold {
         return id;
     }
 
-    public int getNumSeats() {
-        return numSeats;
-    }
 
     public String getCustomerEmail() {
         return customerEmail;
