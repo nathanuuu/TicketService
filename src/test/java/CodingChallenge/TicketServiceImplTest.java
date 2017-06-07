@@ -8,22 +8,22 @@ public class TicketServiceImplTest {
 
     @Test
     public void seatsAvailableInitializeTest() {
-        TicketService ts = new TicketServiceImpl(33, 9);
+        TicketService ts = new TicketServiceImpl(33, 9, 60);
         assertTrue(ts.numSeatsAvailable() == 297);
 
-        ts = new TicketServiceImpl(1, 9);
+        ts = new TicketServiceImpl(1, 9, 60);
         assertTrue(ts.numSeatsAvailable() == 9);
 
-        ts = new TicketServiceImpl(9, 1);
+        ts = new TicketServiceImpl(9, 1, 60);
         assertTrue(ts.numSeatsAvailable() == 9);
 
-        ts = new TicketServiceImpl(0, 9);
+        ts = new TicketServiceImpl(0, 9, 60);
         assertTrue(ts.numSeatsAvailable() == 0);
     }
 
     @Test
     public void seatsAvailableAfterReserveTest() {
-        TicketService ts = new TicketServiceImpl(33, 9);
+        TicketService ts = new TicketServiceImpl(33, 9, 60);
         assertTrue(ts.numSeatsAvailable() == 297);
         SeatHold seatHold = ts.findAndHoldSeats(10, "email@company.com");
         int confirmationID = seatHold.getId();

@@ -1,5 +1,7 @@
 package CodingChallenge;
 
+import org.apache.commons.cli.*;
+
 import java.util.*;
 
 public class TicketServiceImpl implements TicketService {
@@ -13,7 +15,7 @@ public class TicketServiceImpl implements TicketService {
     static String RESERVE_COMMAND = "reserve";
     static String EXIT_COMMAND = "exit";
 
-    static int EXPIRATION = 600000;
+    int EXPIRATION = 600000;
 
     Random rand = new Random();
 
@@ -23,11 +25,12 @@ public class TicketServiceImpl implements TicketService {
 
     private Theater theater;
 
-    public TicketServiceImpl(int rows, int cols) {
+    public TicketServiceImpl(int rows, int cols, int expireSeconds) {
         this.theater = new Theater(rows, cols);
         this.seatHoldList = new ArrayList<SeatHold>();
         this.emailTable = new HashMap<String, ArrayList<SeatHold>>();
         this.idTable = new HashMap<Integer, SeatHold>();
+        this.EXPIRATION = expireSeconds * 1000;
     }
 
     private void addSeatHold(SeatHold seatHold) {
@@ -133,18 +136,16 @@ public class TicketServiceImpl implements TicketService {
         this.theater.printSeatMap();
     }
 
-    public static void main(String[] args) {
-        TicketService ts = new TicketServiceImpl(9, 33);
+    private void commandLineHandler() {
         Scanner scanner = new Scanner(System.in);
-
         while (true) {
-            ts.printSeatMap();
+            printSeatMap();
             System.out.print("Enter your option: ");
             String[] arguments = scanner.nextLine().split(" ");
 
             String command = arguments[0];
             if (command.equals(GET_NUMBER_COMMAND)) {
-                System.out.println("There are " + ts.numSeatsAvailable() + " seats available.");
+                System.out.println("There are " + numSeatsAvailable() + " seats available.");
             } else if (command.equals(FIND_AND_HOLD_COMMAND)) {
                 int numSeats;
                 String customerEmail;
@@ -155,7 +156,7 @@ public class TicketServiceImpl implements TicketService {
                     System.out.println(COMMAND_PROMPT);
                     continue;
                 }
-                SeatHold seatHold = ts.findAndHoldSeats(numSeats, customerEmail);
+                SeatHold seatHold = findAndHoldSeats(numSeats, customerEmail);
                 if (seatHold == null) {
                     System.out.println("System error!");
                 }
@@ -163,7 +164,7 @@ public class TicketServiceImpl implements TicketService {
                     String idString = String.format("%09d", seatHold.getId());
                     Date expirationDate = new Date(seatHold.getTime() + EXPIRATION);
                     System.out.println(seatHold.getMessage() + "Confirmation ID: " + idString
-                        + " Your hold will expire on " + expirationDate);
+                            + " Your hold will expire on " + expirationDate);
                 } else {
                     System.out.println("Seat hold failed. " + seatHold.getMessage());
                 }
@@ -177,7 +178,7 @@ public class TicketServiceImpl implements TicketService {
                     System.out.println(COMMAND_PROMPT);
                     continue;
                 }
-                String reserveMessage = ts.reserveSeats(seatHoldID, customerEmail);
+                String reserveMessage = reserveSeats(seatHoldID, customerEmail);
                 System.out.println("Seat reservation " + reserveMessage);
             } else if (command.equals(EXIT_COMMAND)) {
                 System.exit(0);
@@ -185,5 +186,52 @@ public class TicketServiceImpl implements TicketService {
                 System.out.println(COMMAND_PROMPT);
             }
         }
+    }
+
+    public static void main(String[] args) {
+        Options options = new Options();
+
+        Option rows = new Option("r", "rows", true, "number of rows");
+        rows.setRequired(false);
+        options.addOption(rows);
+
+        Option columns = new Option("c", "columns", true, "number of columns");
+        columns.setRequired(false);
+        options.addOption(columns);
+
+        Option expire = new Option("e", "expire", true, "number of seconds for hold to expire");
+        expire.setRequired(false);
+        options.addOption(expire);
+
+        CommandLineParser parser = new DefaultParser();
+        HelpFormatter formatter = new HelpFormatter();
+        CommandLine cmd;
+
+        try {
+            cmd = parser.parse(options, args);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            formatter.printHelp("options", options);
+            System.exit(1);
+            return;
+        }
+
+        String rowCount = null;
+        String colCount = null;
+        String expireSecondsCount = null;
+        if (cmd.hasOption("rows")) rowCount = cmd.getOptionValue("rows");
+        if (cmd.hasOption("columns")) colCount = cmd.getOptionValue("columns");
+        if (cmd.hasOption("expire")) expireSecondsCount = cmd.getOptionValue("expire");
+
+        int numRows = 9;
+        int numCols = 33;
+        int numExpireSeconds = 300;
+
+        if (rowCount != null) numRows = Integer.parseInt(rowCount);
+        if (colCount != null) numCols = Integer.parseInt(colCount);
+        if (expireSecondsCount != null) numExpireSeconds = Integer.parseInt(expireSecondsCount);
+
+        TicketServiceImpl ts = new TicketServiceImpl(numRows, numCols, numExpireSeconds);
+        ts.commandLineHandler();
     }
 }
