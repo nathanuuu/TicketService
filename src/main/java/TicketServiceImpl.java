@@ -1,4 +1,3 @@
-import java.lang.reflect.Array;
 import java.util.*;
 
 public class TicketServiceImpl implements TicketService {
@@ -12,7 +11,7 @@ public class TicketServiceImpl implements TicketService {
     static String RESERVE_COMMAND = "reserve";
     static String EXIT_COMMAND = "exit";
 
-    static int EXPIRATION = 5000;
+    static int EXPIRATION = 600000;
 
     Random rand = new Random();
 
@@ -75,6 +74,7 @@ public class TicketServiceImpl implements TicketService {
     }
 
     public int numSeatsAvailable() {
+        removeExpiredSeatHold();
         return this.theater.getAvailableSeats();
     }
 
@@ -97,7 +97,7 @@ public class TicketServiceImpl implements TicketService {
             if (heldSeats == null) {
                 return new SeatHold(false, "Not enough seats available. Try again later.");
             } else {
-                SeatHold seatHold = new SeatHold(true, idGenerator(), numSeats, customerEmail, heldSeats);
+                SeatHold seatHold = new SeatHold(true, idGenerator(), customerEmail, heldSeats);
                 addSeatHold(seatHold);
                 return seatHold;
             }
@@ -108,10 +108,23 @@ public class TicketServiceImpl implements TicketService {
     }
 
     public String reserveSeats(int seatHoldId, String customerEmail) {
+        long currentTime = System.currentTimeMillis();
+        String failureMessage = "Reservation failed. Please make sure your inputs are correct, " +
+                "and your hold has not expired.";
+        SeatHold seatHold = idTable.get(seatHoldId);
+        if (seatHold == null || emailTable.get(customerEmail) == null
+                || emailTable.get(customerEmail).contains(seatHold) == false) {
+            return failureMessage;
+        }
         // need to check time stamp for expiration in case it is not reaped
-        // TODO: 6/6/17  
-
-        return "ok";
+        if (seatHold.getTime() + this.EXPIRATION < currentTime) {
+            deleteSeatHold(seatHold);
+            theater.releaseSeats(seatHold.getSeats());
+            return failureMessage;
+        }
+        theater.reserveSeats(seatHold.getSeats());
+        deleteSeatHold(seatHold);
+        return "Reservation succeeded!";
     }
 
     public void printSeatMap() {
@@ -146,7 +159,9 @@ public class TicketServiceImpl implements TicketService {
                 }
                 if (seatHold.isSuccess() == true) {
                     String idString = String.format("%09d", seatHold.getId());
-                    System.out.println(seatHold.getMessage() + "Confirmation ID: " + idString);
+                    Date expirationDate = new Date(seatHold.getTime() + EXPIRATION);
+                    System.out.println(seatHold.getMessage() + "Confirmation ID: " + idString
+                        + " Your hold will expire on " + expirationDate);
                 } else {
                     System.out.println("Seat hold failed. " + seatHold.getMessage());
                 }

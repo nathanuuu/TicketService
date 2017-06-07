@@ -16,8 +16,7 @@ public class SeatHold {
         this.message = message;
     }
 
-    public SeatHold(boolean success, int id, int numSeats,
-                    String customerEmail, int[][] seats) throws Exception {
+    public SeatHold(boolean success, int id, String customerEmail, int[][] seats) throws Exception {
         if (success != true) {
             throw new Exception("Method can only be called with true value.");
         }
