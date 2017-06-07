@@ -1,7 +1,5 @@
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Random;
-import java.util.Scanner;
+import java.lang.reflect.Array;
+import java.util.*;
 
 public class TicketServiceImpl implements TicketService {
 
@@ -13,6 +11,8 @@ public class TicketServiceImpl implements TicketService {
     static String FIND_AND_HOLD_COMMAND = "hold";
     static String RESERVE_COMMAND = "reserve";
     static String EXIT_COMMAND = "exit";
+
+    static int EXPIRATION = 5000;
 
     Random rand = new Random();
 
@@ -47,18 +47,31 @@ public class TicketServiceImpl implements TicketService {
 
     private void deleteSeatHold(SeatHold seatHold) {
         // remove from seat hold list
-
+        seatHoldList.remove(seatHold);
         // remove from email table
-
+        ArrayList<SeatHold> seatHoldArrayList = emailTable.get(seatHold.getCustomerEmail());
+        if (seatHoldArrayList.size() > 1) {
+            seatHoldArrayList.remove(seatHold);
+        } else {
+            emailTable.remove(seatHold.getCustomerEmail());
+        }
         // remove from id table
-
+        idTable.remove(seatHold.getId());
     }
 
     private void removeExpiredSeatHold() {
         // starting from the beginning of the seat hold list, check the time stamp
         // invoke deleteSeatHold if time stamp expired, stop when the seat hold is
         // not expired
-
+        while (seatHoldList.size() > 0) {
+            SeatHold seatHold = seatHoldList.get(0);
+            if (seatHold.getTime() + this.EXPIRATION < System.currentTimeMillis()) {
+                deleteSeatHold(seatHold);
+                theater.releaseSeats(seatHold.getSeats());
+            } else {
+                break;
+            }
+        }
     }
 
     public int numSeatsAvailable() {
@@ -74,6 +87,8 @@ public class TicketServiceImpl implements TicketService {
     }
 
     public SeatHold findAndHoldSeats(int numSeats, String customerEmail) {
+        // Free up some expired seats for better search results
+        removeExpiredSeatHold();
         try {
             if (numSeats <= 0) {
                 return new SeatHold(false, "Invalid quantity of seats to hold.");

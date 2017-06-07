@@ -26,6 +26,7 @@ public class SeatHold {
         this.numSeats = numSeats;
         this.customerEmail = customerEmail;
         this.time = System.currentTimeMillis();
+        this.seats = seats;
     }
 
     public int getId() {
